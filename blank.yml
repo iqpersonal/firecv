@@ -1,4 +1,4 @@
-# This workflow is responsible for deploying your app to Firebase App Hosting.
+# .github/workflows/deploy.yml
 
 name: Deploy to Firebase App Hosting
 
