@@ -1,0 +1,31 @@
+# This workflow is responsible for deploying your app to Firebase App Hosting.
+
+name: Deploy to Firebase App Hosting
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Deploy to App Hosting
+        uses: google-github-actions/deploy-apphosting@v1.0.1
+        with:
+          backend_id: firecv
+          location: asia-east1
