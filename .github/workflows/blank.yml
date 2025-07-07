@@ -1,36 +1,38 @@
-# This is a basic workflow to help you get started with Actions
+# This workflow is responsible for deploying your app to Firebase App Hosting.
 
-name: CI
+name: Deploy to Firebase App Hosting
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ "main" ] # Deploys on every push to the main branch
+  workflow_dispatch: # Allows manual deployment from the Actions tab
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # This is required to authenticate with Google Cloud
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      # Step 1: Check out your repository's code
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      # Step 2: Authenticate to Google Cloud using secrets set up by Firebase
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+      # Step 3: Deploy your backend to Firebase App Hosting
+      - name: Deploy to App Hosting
+        uses: google-github-actions/deploy-apphosting@v0
+        with:
+          # This is the ID of your backend from the Firebase console
+          backend_id: firecv 
+          
+          # This is the location of your backend from the Firebase console
+          location: asia-east1
